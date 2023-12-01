@@ -1,32 +1,14 @@
-from flask import Flask, request, jsonify
-import sqlite3
-import json
-from os.path import exists
+from db import get_db_conn
+from flask import request, Blueprint
 from models.User import User
 from models.Query import Query
-from flask_cors import CORS
-
-app = Flask(__name__)
-CORS(app)
-
-db_path = "database.db"
-
-# Initialize DB if it doesn't exist already
-if not exists(db_path):
-    db = sqlite3.connect(db_path)
-
-    with open("schema.sql") as schema:
-        db.executescript(schema.read())
-        db.close()
+import json
 
 
-def get_db_conn():
-    conn = sqlite3.connect(db_path)
-    conn.row_factory = sqlite3.Row
-    return conn
+user = Blueprint("user", __name__)
 
 
-@app.route("/user/<int:id>", methods=["GET"])
+@user.route("/user/<int:id>", methods=["GET"])
 def get_user(id):
     conn = get_db_conn()
 
@@ -39,7 +21,7 @@ def get_user(id):
         return "User not found", 404
 
 
-@app.route("/user/<int:id>", methods=["POST"])
+@user.route("/user/<int:id>", methods=["POST"])
 def add_user(id):
     args = request.get_json()
 
@@ -55,7 +37,7 @@ def add_user(id):
         return f"User {id} created", 201
 
 
-@app.route("/user", methods=["GET"])
+@user.route("/user", methods=["GET"])
 def get_users():
     conn = get_db_conn()
     users: list[User] = [
@@ -65,7 +47,7 @@ def get_users():
     return [json.dumps(u.__dict__) for u in users], 200
 
 
-@app.route("/user/<int:userId>/queries", methods=["POST"])
+@user.route("/user/<int:userId>/queries", methods=["POST"])
 def add_user_query(userId):
     args = request.get_json()
 
@@ -73,11 +55,8 @@ def add_user_query(userId):
         return "Missing query", 400
     else:
         conn = get_db_conn()
-        conn.execute(
-            f"INSERT INTO queries (userId, query) VALUES ({userId}, '{args['query']}')"
-        )
         new_query = conn.execute(
-            f"SELECT * FROM queries WHERE userId = {userId} AND query = '{args['query']}'"
+            f"INSERT INTO queries (userId, query) VALUES ({userId}, '{args['query']}') RETURNING *"
         ).fetchone()
         new_query = Query.from_row(new_query)
         conn.commit()
@@ -85,7 +64,7 @@ def add_user_query(userId):
         return json.dumps(new_query.__dict__), 201
 
 
-@app.route("/user/<int:userId>/queries", methods=["GET"])
+@user.route("/user/<int:userId>/queries", methods=["GET"])
 def get_user_queries(userId):
     conn = get_db_conn()
     queries: list[Query] = [
@@ -96,12 +75,3 @@ def get_user_queries(userId):
     ]
     conn.close()
     return queries, 200
-
-
-@app.route("/user/<int:userId>/queries/<int:queryId>", methods=["DELETE"])
-def delete_query(userId, queryId):
-    conn = get_db_conn()
-    conn.execute(f"DELETE FROM queries WHERE id = {queryId}")
-    conn.commit()
-    conn.close()
-    return "Success", 200

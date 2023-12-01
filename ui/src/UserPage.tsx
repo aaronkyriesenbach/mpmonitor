@@ -1,8 +1,8 @@
-import axios from "axios";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import QueryInput from "./QueryInput";
 import UserCreator from "./UserCreator";
+import { deleteQuery, getUser, getUserQueries } from "./Api";
 
 export default function UserPage() {
   const { userId } = useParams();
@@ -10,28 +10,27 @@ export default function UserPage() {
   const [queries, setQueries] = useState<Query[]>([]);
 
   useEffect(() => {
-    axios
-      .get(`http://localhost:5000/user/${userId}`)
-      .then((res) => {
-        if (res.data) {
-          setFirstName(res.data);
-        }
-      })
-      .catch((r) => console.log(r));
+    if (userId) {
+      getUser(userId)
+        .then((res) => {
+          if (res.data) {
+            setFirstName(res.data);
+          }
+        })
+        .catch((r) => console.log(r));
+    }
   }, []);
 
   useEffect(() => {
-    // If user exists
-    if (firstName) {
-      axios.get(`http://localhost:5000/user/${userId}/queries`).then((res) => {
+    if (userId && firstName) {
+      getUserQueries(userId).then((res) => {
         setQueries(res.data.map((q: string) => JSON.parse(q)));
       });
     }
   }, [firstName]);
 
-  const deleteQuery = (queryId: number) => {
-    axios
-      .delete(`http://localhost:5000/user/${userId}/queries/${queryId}`)
+  const deleteQueryAndHide = (queryId: number) => {
+    deleteQuery(queryId)
       .then(() => setQueries(queries.filter((q) => q.id != queryId)))
       .catch((r) => console.log(r));
   };
@@ -44,7 +43,7 @@ export default function UserPage() {
         {queries.map((q) => (
           <div key={q.id}>
             {q.query}
-            <button onClick={() => deleteQuery(q.id)}>Delete</button>
+            <button onClick={() => deleteQueryAndHide(q.id)}>Delete</button>
           </div>
         ))}
         <div>

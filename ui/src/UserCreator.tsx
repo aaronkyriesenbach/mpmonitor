@@ -1,16 +1,17 @@
-import axios from "axios";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
+import { createUser } from "./Api";
 
 export default function UserCreator() {
   const { userId } = useParams();
   const [name, setName] = useState("");
 
   const submit = () => {
-    axios
-      .post(`http://localhost:5000/user/${userId}`, { firstName: name })
-      .then(() => window.location.reload())
-      .catch((r) => console.log(r));
+    if (userId) {
+      createUser(userId, name)
+        .then(() => window.location.reload())
+        .catch((r) => console.log(r));
+    }
   };
 
   return (

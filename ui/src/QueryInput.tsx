@@ -1,15 +1,12 @@
-import axios from "axios";
 import { useCallback, useState } from "react";
+import { createQuery } from "./Api";
 
 export default function QueryInput(props: QueryInputProps) {
   const { userId, addQuery } = props;
   const [query, setQuery] = useState("");
 
   const submit = useCallback(() => {
-    axios
-      .post(`http://localhost:5000/user/${userId}/queries`, {
-        query: query,
-      })
+    createQuery(userId, query)
       .then((res) => {
         if (res.data) {
           addQuery(res.data);
