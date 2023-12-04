@@ -1,11 +1,16 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+const phoneRegex = new RegExp(/^\+1\d{10}$/);
 
 export default function LandingPage() {
   const [phone, setPhone] = useState("");
+  const [validPhone, setValidPhone] = useState(false);
+
+  useEffect(() => setValidPhone(phoneRegex.test(phone)), [phone]);
 
   return (
     <div>
-      Phone number:
+      Phone number (format +1xxxxxxxxxx):
       <input
         type="text"
         id="phoneInput"
@@ -14,6 +19,7 @@ export default function LandingPage() {
       />
       <input
         type="submit"
+        disabled={!validPhone}
         onClick={() => (window.location.href = `/user/${phone}`)}
       />
     </div>
