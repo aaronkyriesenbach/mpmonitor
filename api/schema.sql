@@ -11,3 +11,9 @@ CREATE TABLE queries (
     query TEXT NOT NULL,
     userId INTEGER NOT NULL
 );
+
+CREATE TABLE notifications (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    url TEXT NOT NULL,
+    userId INTEGER NOT NULL
+);

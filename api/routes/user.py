@@ -41,7 +41,7 @@ def add_user(id):
 def get_users():
     conn = get_db_conn()
     users: list[User] = [
-        User(*row) for row in conn.execute("SELECT * FROM users").fetchall()
+        User.from_row(row) for row in conn.execute("SELECT * FROM users").fetchall()
     ]
     conn.close()
     return [json.dumps(u.__dict__) for u in users], 200
