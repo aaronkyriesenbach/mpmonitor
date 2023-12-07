@@ -2,8 +2,9 @@ DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS queries;
 
 CREATE TABLE users (
-    id INTEGER PRIMARY KEY,
-    firstName TEXT NOT NULL
+    id TEXT PRIMARY KEY,
+    firstName TEXT NOT NULL,
+    provider TEXT NOT NULL
 );
 
 CREATE TABLE queries (

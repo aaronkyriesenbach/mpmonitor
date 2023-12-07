@@ -8,11 +8,11 @@ import json
 user = Blueprint("user", __name__)
 
 
-@user.route("/user/<int:id>", methods=["GET"])
-def get_user(id):
+@user.route("/user/<string:id>", methods=["GET"])
+def get_user(id: str):
     conn = get_db_conn()
 
-    user = conn.execute(f"SELECT firstName FROM users WHERE id = {id}").fetchone()
+    user = conn.execute(f"SELECT firstName FROM users WHERE id = '{id}'").fetchone()
     conn.close()
 
     if user and user["firstName"]:
@@ -21,16 +21,18 @@ def get_user(id):
         return "User not found", 404
 
 
-@user.route("/user/<int:id>", methods=["POST"])
-def add_user(id):
+@user.route("/user/<string:id>", methods=["POST"])
+def add_user(id: str):
     args = request.get_json()
 
     if not args["firstName"]:
         return "Missing firstName", 400
+    elif not args["provider"]:
+        return "Missing provider", 400
     else:
         conn = get_db_conn()
         conn.execute(
-            f"INSERT INTO users (id, firstName) VALUES ({id}, '{args['firstName']}')"
+            f"INSERT INTO users (id, firstName, provider) VALUES ('{id}', '{args['firstName']}', '{args['provider']}')"
         )
         conn.commit()
         conn.close()
@@ -47,8 +49,8 @@ def get_users():
     return [json.dumps(u.__dict__) for u in users], 200
 
 
-@user.route("/user/<int:userId>/queries", methods=["POST"])
-def add_user_query(userId):
+@user.route("/user/<string:userId>/queries", methods=["POST"])
+def add_user_query(userId: str):
     args = request.get_json()
 
     if not args["query"]:
@@ -64,8 +66,8 @@ def add_user_query(userId):
         return json.dumps(new_query.__dict__), 201
 
 
-@user.route("/user/<int:userId>/queries", methods=["GET"])
-def get_user_queries(userId):
+@user.route("/user/<string:userId>/queries", methods=["GET"])
+def get_user_queries(userId: str):
     conn = get_db_conn()
     queries: list[Query] = [
         json.dumps(Query.from_row(q).__dict__)

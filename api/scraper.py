@@ -1,13 +1,13 @@
 from bs4 import BeautifulSoup
 import requests
-from constants import FORUM_PATH
+from constants import FORUM_PATH, EMAIL_SMS_DOMAINS
 from models.Post import Post
 from db import get_db_conn
 from models.User import User
 from models.Query import Query
 from dotenv import load_dotenv
-import os
-from twilio.rest import Client
+from emailsender import send
+from time import sleep
 
 load_dotenv()
 
@@ -23,10 +23,6 @@ def get_posts():
 
 def check_all_queries():
     posts = get_posts()
-
-    twilio_client = Client(
-        os.environ["TWILIO_ACCOUNT_SID"], os.environ["TWILIO_AUTH_TOKEN"]
-    )
 
     conn = get_db_conn()
 
@@ -52,13 +48,13 @@ def check_all_queries():
 
                     if not already_notified:
                         print("Notifying")
-                        twilio_client.messages.create(
-                            messaging_service_sid=os.environ[
-                                "TWILIO_MESSAGING_SERVICE_SID"
-                            ],
-                            body=f'New result for query "{q.query}": {p.url}',
-                            to=u.id,
+                        send(
+                            f"{u.id}@{EMAIL_SMS_DOMAINS[u.provider]}",
+                            f'New result for your query "{q.query}"!',
                         )
+                        sleep(1.5)
+                        send(f"{u.id}@{EMAIL_SMS_DOMAINS[u.provider]}", p.url[12:])
+                        sleep(1.5)
                         conn.execute(
                             f"INSERT INTO notifications (userId, url) VALUES ({u.id}, '{p.url}')"
                         )
