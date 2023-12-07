@@ -59,6 +59,3 @@ def check_all_queries():
                             f"INSERT INTO notifications (userId, url) VALUES ({u.id}, '{p.url}')"
                         )
                         conn.commit()
-
-
-check_all_queries()
