@@ -7,10 +7,16 @@ from routes.query import query
 from constants import DB_PATH
 from scraper import check_all_queries
 from apscheduler.schedulers.background import BackgroundScheduler
+from datetime import datetime
+import logging
+
+logging.basicConfig(filename="log.txt", encoding="utf-8", level=logging.INFO)
+logging.info(f"Starting up at {datetime.now()}")
 
 
 # Initialize DB if it doesn't exist already
 if not exists(DB_PATH):
+    logging.info(f"No database exists, creating...")
     db = sqlite3.connect(DB_PATH)
 
     with open("schema.sql") as schema:
@@ -26,3 +32,4 @@ app.register_blueprint(query)
 scheduler = BackgroundScheduler()
 scheduler.add_job(check_all_queries, "interval", minutes=1)
 scheduler.start()
+logging.info("Query check job added; scheduler started")

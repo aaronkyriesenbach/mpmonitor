@@ -8,6 +8,7 @@ from models.Query import Query
 from dotenv import load_dotenv
 from emailsender import send
 from time import sleep
+import logging
 
 load_dotenv()
 
@@ -28,17 +29,15 @@ def check_all_queries():
 
     users = [User.from_row(row) for row in conn.execute("SELECT * FROM users")]
     for u in users:
-        print(f"Checking queries for user {u.id}")
+        logging.info(f"Checking queries for user {u.id}")
         queries = [
             Query.from_row(row)
             for row in conn.execute(f"SELECT * FROM queries WHERE userId = {u.id}")
         ]
         for q in queries:
-            print(f"Checking query {q.query}")
+            logging.info(f"Checking query {q.query}")
             for p in posts:
                 if p.matches_text(q.query):
-                    print(f"Post {p.title} matches query {q.query}")
-
                     already_notified = (
                         conn.execute(
                             f"SELECT * FROM notifications WHERE url = '{p.url}'"
@@ -46,8 +45,11 @@ def check_all_queries():
                         is not None
                     )
 
+                    logging.info(
+                        f"Post {p.title} matches query {q.query}, {'already notified' if already_notified else 'notifying'}"
+                    )
+
                     if not already_notified:
-                        print("Notifying")
                         send(
                             f"{u.id}@{EMAIL_SMS_DOMAINS[u.provider]}",
                             f'New result for your query "{q.query}"!',

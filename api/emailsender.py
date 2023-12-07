@@ -1,5 +1,6 @@
 import smtplib, ssl
 import os
+import logging
 
 
 def send(address, message):
@@ -10,5 +11,5 @@ def send(address, message):
             os.environ["MPMONITOR_EMAIL"], os.environ["MPMONITOR_APP_PASSWORD"]
         )
 
-        print(f"Sending message '{message}' to email {address}")
+        logging.info(f"Sending message '{message}' to email {address}")
         server.sendmail(os.environ["MPMONITOR_EMAIL"], address, message)
