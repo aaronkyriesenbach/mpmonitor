@@ -1,7 +1,8 @@
 from enum import Enum
+import os
 
 
-DB_PATH = "database.db"
+DB_PATH = os.environ["DB_PATH"] or "database.db"
 FORUM_PATH = (
     "https://www.mountainproject.com/forum/103989416/for-sale-for-free-want-to-buy"
 )
