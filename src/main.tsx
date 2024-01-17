@@ -1,12 +1,12 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import LandingPage from "./LandingPage.tsx";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import LandingPage from "./LandingPage.tsx";
 import UserPage from "./UserPage.tsx";
 
 const router = createBrowserRouter([
   { path: "/", element: <LandingPage /> },
-  { path: "/user/:userId", element: <UserPage /> },
+  { path: "/user/:id", element: <UserPage /> },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(

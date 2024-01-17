@@ -1,56 +1,67 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import QueryInput from "./QueryInput";
+import { getUser, putUser } from "./Api";
 import UserCreator from "./UserCreator";
-import { deleteQuery, getUser, getUserQueries } from "./Api";
 
 export default function UserPage() {
-  const { userId } = useParams();
-  const [firstName, setFirstName] = useState("");
-  const [queries, setQueries] = useState<Query[]>([]);
+  const { id } = useParams();
+  const [user, setUser] = useState<User>();
+  const [addQueryText, setAddQueryText] = useState("");
 
   useEffect(() => {
-    if (userId) {
-      getUser(userId)
-        .then((res) => {
-          if (res.data) {
-            setFirstName(res.data);
-          }
-        })
-        .catch((r) => console.log(r));
+    if (id) {
+      getUser(id).then((res) => {
+        if (res.Items?.length === 1) {
+          const user = res.Items[0] as User;
+
+          setUser(user);
+        }
+      });
     }
   }, []);
 
-  useEffect(() => {
-    if (userId && firstName) {
-      getUserQueries(userId).then((res) => {
-        setQueries(res.data.map((q: string) => JSON.parse(q)));
-      });
-    }
-  }, [firstName]);
+  const addQuery = () => {
+    if (user) {
+      const queries = user.queries || [];
+      if (!queries.includes(addQueryText)) {
+        const updatedUser = { ...user, queries: [...queries, addQueryText] };
 
-  const deleteQueryAndHide = (queryId: number) => {
-    deleteQuery(queryId)
-      .then(() => setQueries(queries.filter((q) => q.id != queryId)))
-      .catch((r) => console.log(r));
+        putUser(updatedUser).then(() => setUser(updatedUser));
+        setAddQueryText("");
+      }
+    }
   };
 
-  if (firstName) {
+  const removeQuery = (queryToRemove: string) => {
+    if (user) {
+      const updatedQueries = user.queries?.filter((q) => q !== queryToRemove);
+
+      const updatedUser = { ...user, queries: updatedQueries };
+
+      putUser(updatedUser).then(() => setUser(updatedUser));
+    }
+  };
+
+  if (user) {
     return (
       <div>
-        <h1>Welcome, {firstName}!</h1>
+        <h1>Welcome, {user.name}!</h1>
         <h3>Your queries:</h3>
-        {queries.map((q) => (
-          <div key={q.id}>
-            {q.query}
-            <button onClick={() => deleteQueryAndHide(q.id)}>Delete</button>
+        {user.queries?.map((q) => (
+          <div key={q}>
+            {q}
+            <button onClick={() => removeQuery(q)}>Delete</button>
           </div>
         ))}
+
         <div>
-          <QueryInput
-            userId={userId!}
-            addQuery={(q) => setQueries([...queries, q])}
+          Add a query:
+          <input
+            type="text"
+            value={addQueryText}
+            onChange={(e) => setAddQueryText(e.target.value)}
           />
+          <input type="submit" onClick={addQuery} />
         </div>
       </div>
     );

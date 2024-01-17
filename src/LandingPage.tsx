@@ -1,12 +1,41 @@
 import { useEffect, useState } from "react";
+import { getUserByPhone, putUser } from "./Api";
 
 const phoneRegex = new RegExp(/^\+1\d{10}$/);
 
 export default function LandingPage() {
   const [phone, setPhone] = useState("");
   const [validPhone, setValidPhone] = useState(false);
+  const [creatingUser, setCreatingUser] = useState(false);
+  const [name, setName] = useState("");
 
   useEffect(() => setValidPhone(phoneRegex.test(phone)), [phone]);
+
+  const submit = () => {
+    if (creatingUser) {
+      const newUser: User = {
+        id: crypto.randomUUID(),
+        phone: phone,
+        name: name,
+      };
+
+      putUser(newUser).then(
+        () => (window.location.href = `/user/${newUser.id}`)
+      );
+    } else {
+      getUserByPhone(phone).then((res) => {
+        const matchingUsers = res.Items as User[];
+
+        if (matchingUsers.length === 1) {
+          const user = matchingUsers[0];
+
+          window.location.href = `/user/${user.id}`;
+        } else {
+          setCreatingUser(true);
+        }
+      });
+    }
+  };
 
   return (
     <div>
@@ -17,11 +46,18 @@ export default function LandingPage() {
         value={phone}
         onChange={(e) => setPhone(e.target.value)}
       />
-      <input
-        type="submit"
-        disabled={!validPhone}
-        onClick={() => (window.location.href = `/user/${phone}`)}
-      />
+      {creatingUser && (
+        <div>
+          First name:
+          <input
+            type="text"
+            id="nameInput"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+        </div>
+      )}
+      <input type="submit" disabled={!validPhone} onClick={submit} />
     </div>
   );
 }

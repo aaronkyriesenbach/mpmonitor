@@ -1,27 +1,47 @@
-import axios from "axios";
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import {
+  DynamoDBDocumentClient,
+  PutCommand,
+  QueryCommand,
+  ScanCommand,
+} from "@aws-sdk/lib-dynamodb";
 
-const API_URL = "http://localhost:5000";
+const TABLE_NAME = "mpmonitor";
 
-export function getUser(userId: string) {
-  return axios.get(`${API_URL}/user/${userId}`);
-}
+const ddb = new DynamoDBClient({
+  region: "us-east-1",
+  credentials: {
+    accessKeyId: import.meta.env.VITE_AWS_ACCESS_KEY_ID,
+    secretAccessKey: import.meta.env.VITE_AWS_SECRET_ACCESS_KEY,
+  },
+});
+const client = DynamoDBDocumentClient.from(ddb);
 
-export function createUser(userId: string, firstName: string) {
-  return axios.post(`${API_URL}/user/${userId}`, {
-    firstName: firstName,
+export function getUser(id: string) {
+  const cmd = new QueryCommand({
+    TableName: TABLE_NAME,
+    KeyConditionExpression: "id = :id",
+    ExpressionAttributeValues: { ":id": id },
   });
+
+  return client.send(cmd);
 }
 
-export function getUserQueries(userId: string) {
-  return axios.get(`${API_URL}/user/${userId}/queries`);
-}
-
-export function deleteQuery(queryId: number) {
-  return axios.delete(`${API_URL}/query/${queryId}`);
-}
-
-export function createQuery(userId: string, query: string) {
-  return axios.post(`${API_URL}/user/${userId}/queries`, {
-    query: query,
+export function getUserByPhone(phone: string) {
+  const cmd = new ScanCommand({
+    TableName: TABLE_NAME,
+    FilterExpression: "phone = :phone",
+    ExpressionAttributeValues: { ":phone": phone },
   });
+
+  return client.send(cmd);
+}
+
+export function putUser(user: User) {
+  const cmd = new PutCommand({
+    TableName: TABLE_NAME,
+    Item: user,
+  });
+
+  return client.send(cmd);
 }
