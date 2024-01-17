@@ -8,6 +8,8 @@ from models.Query import Query
 from dotenv import load_dotenv
 import os
 from twilio.rest import Client
+from constants import DB_PATH
+from os.path import exists
 
 load_dotenv()
 
@@ -22,6 +24,9 @@ def get_posts():
 
 
 def check_all_queries():
+    if not exists(DB_PATH):
+        return
+
     posts = get_posts()
 
     twilio_client = Client(
