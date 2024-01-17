@@ -25,7 +25,9 @@ def check_all_queries():
     posts = get_posts()
 
     twilio_client = Client(
-        os.environ["TWILIO_ACCOUNT_SID"], os.environ["TWILIO_AUTH_TOKEN"]
+        os.environ["TWILIO_API_KEY"],
+        os.environ["TWILIO_API_SECRET"],
+        os.environ["TWILIO_ACCOUNT_SID"]
     )
 
     conn = get_db_conn()

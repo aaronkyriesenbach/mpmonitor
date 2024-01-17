@@ -1,14 +1,15 @@
-from db import get_db_conn
-from flask import request, Blueprint
-from models.User import User
-from models.Query import Query
 import json
 
+from flask import request, Blueprint
+
+from db import get_db_conn
+from models.Query import Query
+from models.User import User
 
 user = Blueprint("user", __name__)
 
 
-@user.route("/user/<int:id>", methods=["GET"])
+@user.route("/user/<string:id>", methods=["GET"])
 def get_user(id):
     conn = get_db_conn()
 
@@ -21,7 +22,7 @@ def get_user(id):
         return "User not found", 404
 
 
-@user.route("/user/<int:id>", methods=["POST"])
+@user.route("/user/<string:id>", methods=["POST"])
 def add_user(id):
     args = request.get_json()
 
@@ -47,7 +48,7 @@ def get_users():
     return [json.dumps(u.__dict__) for u in users], 200
 
 
-@user.route("/user/<int:userId>/queries", methods=["POST"])
+@user.route("/user/<string:userId>/queries", methods=["POST"])
 def add_user_query(userId):
     args = request.get_json()
 
