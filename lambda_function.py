@@ -81,7 +81,7 @@ def get_posts():
     return [Post.from_html(p) for p in post_html]
 
 
-def lambda_handler():
+def lambda_handler(event, lambda_context):
     posts = get_posts()
 
     user_scan = table.scan()
@@ -98,7 +98,7 @@ def lambda_handler():
                     already_notified = p.url in u.notified if u.notified else False
 
                     print(
-                        f"Post \"{p.title}\" matches query\"{q}\", {'already notified' if already_notified else 'notifying'}")
+                        f"Post \"{p.title}\" matches query \"{q}\", {'already notified' if already_notified else 'notifying'}")
 
                     if not already_notified:
                         twilio_client.messages.create(
@@ -109,4 +109,5 @@ def lambda_handler():
                             to=u.phone,
                         )
                         u.notified = [*u.notified, p.url] if u.notified else [p.url]
-                        table.put_item(Item=asdict(u))
+
+        table.put_item(Item=asdict(u))
