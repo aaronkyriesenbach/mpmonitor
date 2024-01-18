@@ -48,17 +48,19 @@ class Post:
         post_html = BeautifulSoup(post_source.content, "html.parser")
 
         content_html = post_html.select_one("table > .message-row")
-        text_html = content_html.select("p")
 
         contents = []
-        for p in text_html:
-            for text in p:
-                try:
-                    contents.append(text)
-                except:
-                    pass
+        if content_html:
+            text_html = content_html.select("p")
 
-        contents = [c for c in contents if type(c) is str]
+            for p in text_html:
+                for text in p:
+                    try:
+                        contents.append(text)
+                    except:
+                        pass
+
+            contents = [c for c in contents if type(c) is str]
 
         return Post(url, title, contents)
 
