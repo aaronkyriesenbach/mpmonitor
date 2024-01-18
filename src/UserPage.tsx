@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getUser, putUser } from "./Api";
-import UserCreator from "./UserCreator";
 
 export default function UserPage() {
   const { id } = useParams();
@@ -66,6 +65,6 @@ export default function UserPage() {
       </div>
     );
   } else {
-    return <UserCreator />;
+    return (<div>Loading...</div>);
   }
 }
