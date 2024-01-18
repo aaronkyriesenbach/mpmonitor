@@ -34,7 +34,7 @@ class Post:
         return f"URL = {self.url}, title = {self.title}, content = {self.content[0] if len(self.content) > 0 else None}"
 
     def matches_text(self, text: str):
-        return text in self.title.lower() or any(text in t for t in [c.lower() for c in self.content])
+        return text.lower() in self.title.lower() or any(text.lower() in t for t in [c.lower() for c in self.content])
 
     @staticmethod
     def from_html(html: Tag):
