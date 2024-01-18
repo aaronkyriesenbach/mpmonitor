@@ -9,19 +9,23 @@ from twilio.rest import Client
 
 load_dotenv()
 
-client = boto3.resource("dynamodb",
-                        region_name="us-east-1",
-                        aws_access_key_id=os.environ["VITE_AWS_ACCESS_KEY_ID"],
-                        aws_secret_access_key=os.environ["VITE_AWS_SECRET_ACCESS_KEY"])
+client = boto3.resource(
+    "dynamodb",
+    region_name="us-east-1",
+    aws_access_key_id=os.environ["VITE_AWS_ACCESS_KEY_ID"],
+    aws_secret_access_key=os.environ["VITE_AWS_SECRET_ACCESS_KEY"],
+)
 table = client.Table("mpmonitor")
 
 twilio_client = Client(
     os.environ["TWILIO_API_KEY"],
     os.environ["TWILIO_API_SECRET"],
-    os.environ["TWILIO_ACCOUNT_SID"]
+    os.environ["TWILIO_ACCOUNT_SID"],
 )
 
-FORUM_PATH = "https://www.mountainproject.com/forum/103989416/for-sale-for-free-want-to-buy"
+FORUM_PATH = (
+    "https://www.mountainproject.com/forum/103989416/for-sale-for-free-want-to-buy"
+)
 
 
 class Post:
@@ -34,7 +38,9 @@ class Post:
         return f"URL = {self.url}, title = {self.title}, content = {self.content[0] if len(self.content) > 0 else None}"
 
     def matches_text(self, text: str):
-        return text.lower() in self.title.lower() or any(text.lower() in t for t in [c.lower() for c in self.content])
+        return text.lower() in self.title.lower() or any(
+            text.lower() in t for t in [c.lower() for c in self.content]
+        )
 
     @staticmethod
     def from_html(html: Tag):
@@ -91,8 +97,7 @@ def lambda_handler(event, lambda_context):
 
     for u in users:
         print(f"Checking queries for user {u.id}")
-        queries = u.queries
-        for q in queries:
+        for q in u.queries if u.queries else []:
             print(f"Checking query {q}")
 
             for p in posts:
@@ -100,14 +105,15 @@ def lambda_handler(event, lambda_context):
                     already_notified = p.url in u.notified if u.notified else False
 
                     print(
-                        f"Post \"{p.title}\" matches query \"{q}\", {'already notified' if already_notified else 'notifying'}")
+                        f"Post \"{p.title}\" matches query \"{q}\", {'already notified' if already_notified else 'notifying'}"
+                    )
 
                     if not already_notified:
                         twilio_client.messages.create(
                             messaging_service_sid=os.environ[
                                 "TWILIO_MESSAGING_SERVICE_SID"
                             ],
-                            body=f"New result for query \"{q}\": {p.url}",
+                            body=f'New result for query "{q}": {p.url}',
                             to=u.phone,
                         )
                         u.notified = [*u.notified, p.url] if u.notified else [p.url]
