@@ -12,3 +12,4 @@ Future improvements to be made:
 
 - Create a better UI
 - Implement some form of 2-factor authentication for login
+- Admin panel?
