@@ -1,5 +1,6 @@
 import os
 from dataclasses import dataclass, asdict
+from re import findall
 
 import boto3
 import requests
@@ -34,8 +35,10 @@ class Post:
         self.title: str = title
         self.content: list[str] = content
 
+        self.id = findall("\d{9}", url)[0]
+
     def __str__(self):
-        return f"URL = {self.url}, title = {self.title}, content = {self.content[0] if len(self.content) > 0 else None}"
+        return f"ID = {self.id}, URL = {self.url}, title = {self.title}, content = {self.content[0] if len(self.content) > 0 else None}"
 
     def matches_text(self, text: str):
         return text.lower() in self.title.lower() or any(
@@ -102,10 +105,10 @@ def lambda_handler(event, lambda_context):
 
             for p in posts:
                 if p.matches_text(q):
-                    already_notified = p.url in u.notified if u.notified else False
+                    already_notified = p.id in u.notified if u.notified else False
 
                     print(
-                        f"Post \"{p.title}\" matches query \"{q}\", {'already notified' if already_notified else 'notifying'}"
+                        f"Post \"{p.title}\" with ID {p.id} matches query \"{q}\", {'already notified' if already_notified else 'notifying'}"
                     )
 
                     if not already_notified:
@@ -116,6 +119,6 @@ def lambda_handler(event, lambda_context):
                             body=f'New result for query "{q}": {p.url}',
                             to=u.phone,
                         )
-                        u.notified = [*u.notified, p.url] if u.notified else [p.url]
+                        u.notified = [*u.notified, p.id] if u.notified else [p.id]
 
         table.put_item(Item=asdict(u))
