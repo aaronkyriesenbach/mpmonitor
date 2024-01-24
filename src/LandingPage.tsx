@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getUserByPhone, putUser } from "./Api";
 import Navbar from "./components/Navbar";
+import PhoneNumberInput from "./components/PhoneNumberInput";
 
 const phoneRegex = new RegExp(/^\+1\d{10}$/);
 
@@ -41,8 +42,10 @@ export default function LandingPage() {
   return (
     <div className="h-100">
       <Navbar />
-      <div className="d-flex flex-column align-items-center justify-content-center h-100 content">
-        Phone number (format +1xxxxxxxxxx):
+      <div className="d-flex flex-column align-items-center justify-content-center h-100 content gap-4">
+        <h1>Welcome to MP Monitor!</h1>
+        <h2>Phone number:</h2>
+        <PhoneNumberInput />
         <input
           type="text"
           id="phoneInput"
