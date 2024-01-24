@@ -1,0 +1,24 @@
+@import url("https://fonts.googleapis.com/css?family=Lobster:regular,bold,italic&subset=latin,latin-ext");
+
+$mp-blue: #336799;
+
+$primary: $mp-blue;
+
+.logo {
+    font-family: "Lobster";
+    font-weight: bold;
+}
+
+html, body, #root {
+    height: 100%;
+}
+
+.navbar {
+    height: 60px;
+}
+
+.content {
+    margin-top: -60px;
+}
+
+@import "bootstrap/scss/bootstrap";

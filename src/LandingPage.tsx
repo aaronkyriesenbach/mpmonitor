@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getUserByPhone, putUser } from "./Api";
+import Navbar from "./components/Navbar";
 
 const phoneRegex = new RegExp(/^\+1\d{10}$/);
 
@@ -38,26 +39,29 @@ export default function LandingPage() {
   };
 
   return (
-    <div>
-      Phone number (format +1xxxxxxxxxx):
-      <input
-        type="text"
-        id="phoneInput"
-        value={phone}
-        onChange={(e) => setPhone(e.target.value)}
-      />
-      {creatingUser && (
-        <div>
-          First name:
-          <input
-            type="text"
-            id="nameInput"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-        </div>
-      )}
-      <input type="submit" disabled={!validPhone} onClick={submit} />
+    <div className="h-100">
+      <Navbar />
+      <div className="d-flex flex-column align-items-center justify-content-center h-100 content">
+        Phone number (format +1xxxxxxxxxx):
+        <input
+          type="text"
+          id="phoneInput"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+        />
+        {creatingUser && (
+          <div>
+            First name:
+            <input
+              type="text"
+              id="nameInput"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </div>
+        )}
+        <input type="submit" disabled={!validPhone} onClick={submit} />
+      </div>
     </div>
   );
 }

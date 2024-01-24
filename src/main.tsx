@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import LandingPage from "./LandingPage.tsx";
 import UserPage from "./UserPage.tsx";
+import "./main.scss";
 
 const router = createBrowserRouter([
   { path: "/", element: <LandingPage /> },
