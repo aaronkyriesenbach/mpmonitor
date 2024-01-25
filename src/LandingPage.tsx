@@ -1,19 +1,17 @@
-import { useEffect, useState } from "react";
-import PhoneInput from "react-phone-number-input/input";
+import { FormEvent, useState } from "react";
+import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
+import "react-phone-number-input/style.css";
 import { getUserByPhone, putUser } from "./Api";
 import Navbar from "./components/Navbar";
 
-const phoneRegex = new RegExp(/^\+1\d{10}$/);
-
 export default function LandingPage() {
   const [phone, setPhone] = useState("");
-  const [validPhone, setValidPhone] = useState(false);
   const [creatingUser, setCreatingUser] = useState(false);
   const [name, setName] = useState("");
 
-  useEffect(() => setValidPhone(phoneRegex.test(phone as string)), [phone]);
+  const submit = (e: FormEvent) => {
+    e.preventDefault();
 
-  const submit = () => {
     if (creatingUser) {
       const newUser: User = {
         id: crypto.randomUUID(),
@@ -42,13 +40,19 @@ export default function LandingPage() {
   return (
     <div className="h-100">
       <Navbar />
-      <div className="d-flex flex-column align-items-center justify-content-center h-100 content gap-4">
+      <form
+        className="d-flex flex-column align-items-center justify-content-center h-100 content gap-4"
+        onSubmit={submit}
+      >
         <h1>Welcome to MP Monitor!</h1>
-        <h2>Phone number:</h2>
-        <PhoneInput value={phone} onChange={(val) => setPhone(val as string)} />
+        <PhoneInput
+          defaultCountry="US"
+          value={phone}
+          onChange={(val) => setPhone(val as string)}
+        />
         {creatingUser && (
-          <div>
-            First name:
+          <div className="d-flex gap-2">
+            <div>First name:</div>
             <input
               type="text"
               id="nameInput"
@@ -57,8 +61,16 @@ export default function LandingPage() {
             />
           </div>
         )}
-        <input type="submit" disabled={!validPhone} onClick={submit} />
-      </div>
+        <button
+          type="submit"
+          className="btn btn-primary"
+          disabled={
+            !(phone && isValidPhoneNumber(phone)) || (creatingUser && !name)
+          }
+        >
+          Submit
+        </button>
+      </form>
     </div>
   );
 }
