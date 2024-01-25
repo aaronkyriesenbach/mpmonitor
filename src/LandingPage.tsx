@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
+import PhoneInput from "react-phone-number-input/input";
 import { getUserByPhone, putUser } from "./Api";
 import Navbar from "./components/Navbar";
-import PhoneNumberInput from "./components/PhoneNumberInput";
 
 const phoneRegex = new RegExp(/^\+1\d{10}$/);
 
@@ -11,7 +11,7 @@ export default function LandingPage() {
   const [creatingUser, setCreatingUser] = useState(false);
   const [name, setName] = useState("");
 
-  useEffect(() => setValidPhone(phoneRegex.test(phone)), [phone]);
+  useEffect(() => setValidPhone(phoneRegex.test(phone as string)), [phone]);
 
   const submit = () => {
     if (creatingUser) {
@@ -45,13 +45,7 @@ export default function LandingPage() {
       <div className="d-flex flex-column align-items-center justify-content-center h-100 content gap-4">
         <h1>Welcome to MP Monitor!</h1>
         <h2>Phone number:</h2>
-        <PhoneNumberInput />
-        <input
-          type="text"
-          id="phoneInput"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-        />
+        <PhoneInput value={phone} onChange={(val) => setPhone(val as string)} />
         {creatingUser && (
           <div>
             First name:
