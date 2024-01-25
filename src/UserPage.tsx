@@ -51,7 +51,7 @@ export default function UserPage() {
   if (user) {
     return (
       <div className="h-100">
-        <Navbar />
+        <Navbar displayLogoutButton={user != undefined}/>
         <div className="d-flex flex-column align-items-start h-100 content gap-4 px-4">
           <h1 className="mt-4">Welcome, {user.name}!</h1>
           <h3>Your queries:</h3>
