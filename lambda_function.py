@@ -38,7 +38,7 @@ class Post:
         self.id = findall("\d{9}", url)[0]
 
     def __str__(self):
-        return f"ID = {self.id}, URL = {self.url}, title = {self.title}, content = {self.content[0] if len(self.content) > 0 else None}"
+        return f"ID = {self.id}, URL = {self.url}, title = {self.title}, content = {self.content}"
 
     def matches_text(self, text: str):
         return text.lower() in self.title.lower() or any(
@@ -65,11 +65,9 @@ class Post:
             for p in text_html:
                 for text in p:
                     try:
-                        contents.append(text)
+                        contents.append(str(text))
                     except:
                         pass
-
-            contents = [c for c in contents if type(c) is str]
 
         return Post(url, title, contents)
 

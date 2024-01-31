@@ -25,3 +25,4 @@ dist-ssr
 .env
 
 lambda_package.zip
+__pycache__
